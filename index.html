@@ -1,0 +1,490 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Nguy?n Khoa Di?m & D?ng dao móa xuÉn - Interactive Showcase</title>
+  <meta name="description" content="Tçm hi?u chung v? t†c gi? Nguy?n Khoa Di?m vÖ bÖi tho 'D?ng dao móa xuÉn' - Website tuong t†c, chuy?n trang siàu nhanh #/ v?i hi?u ?ng animation phong ph£." />
+  
+  <!-- Fonts & Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Playfair+Display:wght@600;700&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.css" />
+  
+  <!-- Core styles -->
+  <style>
+    :root{
+      --bg-1:#0e0f1a; /* deep navy */
+      --bg-2:#1a1133; /* purple night */
+      --fg:#e9ecf1;
+      --muted:#a3acc6;
+      --brand:#7c3aed; /* violet */
+      --accent:#06b6d4; /* cyan */
+      --lime:#84cc16;
+      --glass: rgba(255,255,255,.08);
+      --glass-2: rgba(255,255,255,.14);
+      --radius: 18px;
+      --shadow: 0 10px 30px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.05);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; color:var(--fg); background:radial-gradient(1200px 1200px at 10% 10%,rgba(124,58,237,.18),transparent 60%),
+               radial-gradient(1000px 1000px at 90% 20%,rgba(6,182,212,.18),transparent 60%),
+               linear-gradient(120deg,var(--bg-1),var(--bg-2));
+      font-family:Poppins, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; overflow-x:hidden;
+    }
+    a{color:inherit; text-decoration:none}
+    .nav-blur{
+      position:fixed; inset:0 auto auto 0; right:0; height:72px; z-index:1000;
+      backdrop-filter: blur(8px); background: linear-gradient(90deg, rgba(124,58,237,.25), rgba(6,182,212,.18));
+      border-bottom:1px solid rgba(255,255,255,.08);
+    }
+    .brand{
+      font-weight:700; letter-spacing:.4px; padding:0 .8rem; border-radius:var(--radius);
+      background:linear-gradient(135deg, var(--brand), var(--accent)); -webkit-background-clip:text; background-clip:text; color:transparent;
+    }
+    .nav-link{color:var(--fg)!important; opacity:.85; font-weight:600}
+    .nav-link.active, .nav-link:hover{opacity:1}
+
+    /* Hero */
+    .hero{min-height:90dvh; display:grid; place-items:center; position:relative;}
+    .hero .card{
+      background:linear-gradient(180deg, var(--glass-2), var(--glass)); border:1px solid rgba(255,255,255,.12);
+      border-radius:calc(var(--radius) * 1.3); box-shadow:var(--shadow);
+    }
+    .gradient-title{font-family:'Playfair Display', serif; font-size:clamp(2rem, 4vw + 1rem, 4.4rem); line-height:1.05;}
+    .gradient-title span{background:linear-gradient(135deg,#fff, #c084fc 35%, #67e8f9 70%, #a3e635 100%); -webkit-background-clip:text; background-clip:text; color:transparent}
+    .sub{color:var(--muted)}
+
+    /* Generic section cards */
+    section[data-route]{display:none; padding:110px 0 80px}
+    .show{display:block}
+    .glass{background:linear-gradient(180deg, var(--glass-2), var(--glass)); border:1px solid rgba(255,255,255,.1); border-radius:var(--radius); box-shadow:var(--shadow)}
+    .chip{display:inline-flex; align-items:center; gap:.5rem; padding:.4rem .8rem; border-radius:999px; background:rgba(124,58,237,.15); border:1px solid rgba(124,58,237,.35)}
+
+    /* Cards */
+    .fancy-card{position:relative; overflow:hidden}
+    .fancy-card::before{content:""; position:absolute; inset:-150% -150% auto auto; width:300%; height:300%; background:conic-gradient(from 180deg, transparent, rgba(124,58,237,.25), transparent 30%);
+      filter:blur(40px); transform:rotate(20deg); animation:spin 14s linear infinite}
+    @keyframes spin{to{transform:rotate(380deg)}}
+
+    /* Gallery */
+    .gallery img{width:100%; border-radius:14px; border:1px solid rgba(255,255,255,.1)}
+
+    /* Footer */
+    footer{padding:48px 0; border-top:1px solid rgba(255,255,255,.08); color:var(--muted)}
+
+    /* Cursor */
+    .cursor-dot{position:fixed; left:0; top:0; width:10px; height:10px; border-radius:50%; pointer-events:none; z-index:2000; mix-blend-mode:exclusion; background:#fff; opacity:.9}
+
+    /* Route transition overlay */
+    .page-transition{position:fixed; inset:0; pointer-events:none; z-index:1500}
+    .blob{position:absolute; width:30vmax; height:30vmax; border-radius:50%; filter:blur(40px); opacity:.55; transform:translate(-50%,-50%);
+      background:radial-gradient(circle at 30% 30%, rgba(124,58,237,.9), transparent 60%), radial-gradient(circle at 70% 60%, rgba(6,182,212,.9), transparent 60%);}
+
+    /* Scrollbar */
+    ::-webkit-scrollbar{height:10px; width:10px}
+    ::-webkit-scrollbar-thumb{background:linear-gradient(180deg, #7c3aed, #06b6d4); border-radius:999px}
+  </style>
+</head>
+<body>
+  <canvas id="bg-stars" style="position:fixed;inset:0;z-index:-1"></canvas>
+  <div id="tsparticles"></div>
+
+  <!-- Top Navigation -->
+  <div class="nav-blur">
+    <div class="container h-100 d-flex align-items-center justify-content-between">
+      <a class="brand fs-4" href="#/home" id="brand">D?ng dao móa xuÉn</a>
+      <nav class="d-flex gap-3">
+        <a class="nav-link" data-link href="#/home"><i class="bi bi-stars"></i> Trang ch?</a>
+        <a class="nav-link" data-link href="#/tac-gia"><i class="bi bi-person-vcard"></i> T†c gi?</a>
+        <a class="nav-link" data-link href="#/bai-tho"><i class="bi bi-journal-richtext"></i> BÖi tho</a>
+        <a class="nav-link" data-link href="#/phan-tich"><i class="bi bi-brightness-high"></i> PhÉn t°ch</a>
+        <a class="nav-link" data-link href="#/dong-thoi"><i class="bi bi-clock-history"></i> Dïng th?i gian</a>
+        <a class="nav-link" data-link href="#/thu-vien"><i class="bi bi-images"></i> Thu vi?n</a>
+        <a class="nav-link" data-link href="#/quiz"><i class="bi bi-patch-question"></i> Quiz</a>
+      </nav>
+    </div>
+  </div>
+
+  <!-- Transition overlay blobs -->
+  <div class="page-transition" aria-hidden="true">
+    <div class="blob" id="blob1"></div>
+    <div class="blob" id="blob2"></div>
+  </div>
+
+  <!-- ROUTES -->
+  <main>
+    <!-- HOME -->
+    <section class="hero show" data-route="home">
+      <div class="container py-5">
+        <div class="row g-4 align-items-center">
+          <div class="col-lg-7">
+            <div class="card p-4 p-md-5 fancy-card" data-tilt data-tilt-max="10" data-tilt-speed="400">
+              <div class="chip mb-3"><i class="bi bi-activity"></i><span>Kh?i d?ng</span></div>
+              <h1 class="gradient-title" id="heroTitle">Kh†m ph† <span>Nguy?n Khoa Di?m</span> vÖ <span>"D?ng dao móa xuÉn"</span></h1>
+              <p class="sub fs-5">Website tuong t†c v?i chuy?n trang siàu nhanh #/, ho?t ?nh mu?t, hi?u ?ng cu?n, vÖ l? ch? ngh? thu?t. Cu?n, rà chu?t, b?m c†c m?c d? b?t d?u hÖnh trçnh.</p>
+              <div class="d-flex gap-3 mt-3">
+                <a class="btn btn-lg btn-primary" href="#/tac-gia"><i class="bi bi-person"></i> VÖo ph?n T†c gi?</a>
+                <a class="btn btn-lg btn-outline-info" href="#/bai-tho"><i class="bi bi-book"></i> Xem BÖi tho</a>
+              </div>
+            </div>
+          </div>
+          <div class="col-lg-5">
+            <div class="glass p-4 p-md-5">
+              <h3 class="mb-3"><i class="bi bi-magic"></i> Di?m nh?n</h3>
+              <ul class="list-unstyled m-0">
+                <li class="mb-2"><i class="bi bi-check2-circle text-info"></i> Router hashtag #/ cho chuy?n trang t?c thç</li>
+                <li class="mb-2"><i class="bi bi-check2-circle text-info"></i> GSAP, AOS, Anime.js, Tilt, ScrollTrigger</li>
+                <li class="mb-2"><i class="bi bi-check2-circle text-info"></i> N?n sao d?ng, blob gradient, glassmorphism</li>
+                <li class="mb-2"><i class="bi bi-check2-circle text-info"></i> Quiz mini ìn ki?n th?c</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAC GIA -->
+    <section class="container" data-route="tac-gia">
+      <div class="row g-4 align-items-stretch">
+        <div class="col-lg-7">
+          <article class="glass p-4 p-md-5 fancy-card" data-aos="fade-up">
+            <div class="chip mb-3"><i class="bi bi-person-vcard"></i><span>T†c gi?</span></div>
+            <h2 class="mb-3">Nguy?n Khoa Di?m (s. 1943, Th?a Thiàn Hu?)</h2>
+            <p>
+              NhÖ tho thu?c th? h? ch?ng M?, gi?ng tho tr? tçnh cìng dÉn, giÖu suy tu?ng v? d?t nu?c, nhÉn dÉn vÖ truy?n th?ng van h¢a.
+              T†c ph?m tiàu bi?u: <em>M?t du?ng kh†t v?ng</em> (tru?ng ca, 1971, do?n tr°ch <em>D?t nu?c</em> r?t n?i ti?ng),
+              <em>Ngìi nhÖ c¢ l?a ?m</em>, <em>C†t tr?ng</em>, cóng nhi?u t?p tho, tóy b£t vÖ bÖi ch°nh lu?n.
+            </p>
+            <ul>
+              <li>Phong c†ch: k?t h?p ch?t suy tu?ng, ch?t th? s? v?i hçnh ?nh dÉn gian, gi?ng tÉm tçnh mÖ giÖu t°nh lu?n.</li>
+              <li>Ch? d? l?p l?i: c?i ngu?n van h¢a, tr†ch nhi?m cìng dÉn, kh†t v?ng hïa bçnh, ni?m tin vÖo con ngu?i.</li>
+              <li>Gi?i thu?ng vÖ d¢ng g¢p: nhi?u gi?i thu?ng van h?c, t?ng d?m nhi?m cìng t†c lanh d?o van h¢a.</li>
+            </ul>
+            <div class="alert alert-info mt-3">
+              <i class="bi bi-info-circle"></i> Thìng tin t¢m lu?c, dóng cho m?c tiàu h?c t?p. Tr†nh tr°ch d?n tho dÖi d? tìn tr?ng b?n quy?n.
+            </div>
+          </article>
+        </div>
+        <div class="col-lg-5">
+          <div class="glass p-4 h-100 d-grid align-content-start gap-3" data-aos="zoom-in">
+            <h3 class="m-0">ChÉn dung vÖ b?i c?nh</h3>
+            <p>Tru?ng thÖnh t? mi?n Trung, tho ìng mang Ém hu?ng quà x? Hu?, d?ng th?i d?i tho?i v?i l?ch s? dÉn t?c trong th?i chi?n vÖ h?u chi?n.</p>
+            <div class="gallery row g-3">
+              <div class="col-6"><img alt="gradient" src="https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=1200&auto=format&fit=crop"/></div>
+              <div class="col-6"><img alt="book" src="https://images.unsplash.com/photo-1519681393784-d120267933ba?q=80&w=1200&auto=format&fit=crop"/></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- BAI THO -->
+    <section class="container" data-route="bai-tho">
+      <div class="row g-4">
+        <div class="col-lg-7">
+          <article class="glass p-4 p-md-5 fancy-card" data-aos="fade-up">
+            <div class="chip mb-3"><i class="bi bi-journal-richtext"></i><span>BÖi tho</span></div>
+            <h2 class="mb-3">"D?ng dao móa xuÉn" - Kh†i qu†t</h2>
+            <p>
+              BÖi tho khai th†c di?u d?ng dao dÉn gian d? di?n t? ni?m vui s?ng, ni?m tin vÖo th? h? tr? vÖ nh?ng kh?i d?u tuoi m?i c?a d?t nu?c sau chi?n tranh.
+              Khìng kh° xuÉn r?n rÖng, hçnh ?nh dÉn da, nh?p di?u h?n nhiàn t?o n?n cho c†c suy tu?ng th? s? mang d?m d?u ?n c† nhÉn c?a t†c gi?.
+            </p>
+            <ul>
+              <li><strong>Th? tho</strong>: linh ho?t, nh?p di?u d?ng dao, cÉu ng?n, di?p Ém, di?p t?.</li>
+              <li><strong>Hçnh tu?ng</strong>: móa xuÉn, tr? nh?, c†nh d?ng, ti?ng chim, nh?a s?ng, u?c mo tu?i tr?.</li>
+              <li><strong>Gi?ng di?u</strong>: tuoi vui mÖ l?ng d?ng, h?n nhiàn vÖ giÖu suy tu?ng.</li>
+            </ul>
+            <div class="alert alert-warning"><i class="bi bi-exclamation-triangle"></i> Tr†nh dang nguyàn van dÖi d? b?o v? b?n quy?n. Nàn tr°ch d?n ng?n ph?c v? h?c t?p.</div>
+          </article>
+        </div>
+        <div class="col-lg-5">
+          <div class="glass p-4 h-100" data-aos="zoom-in">
+            <h3 class="mb-2">Tr°ch d?n ng?n</h3>
+            <p class="fst-italic">M?t vÖi dïng ng?n, nàu nh?p di?u d?ng dao vÖ khìng kh° xuÉn. (Ch? minh h?a, khìng dang tr?n.)</p>
+            <div class="d-grid gap-2">
+              <button class="btn btn-outline-light" id="revealLines"><i class="bi bi-music-note-beamed"></i> Hi?u ?ng l? ch?</button>
+              <div id="lines" class="fs-5"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- PHAN TICH -->
+    <section class="container" data-route="phan-tich">
+      <div class="row g-4">
+        <div class="col-12">
+          <article class="glass p-4 p-md-5 fancy-card" data-aos="fade-up">
+            <div class="chip mb-3"><i class="bi bi-brightness-high"></i><span>PhÉn t°ch nhanh</span></div>
+            <div class="row g-4">
+              <div class="col-md-6">
+                <h3>D? tÖi vÖ c?m h?ng</h3>
+                <p>Móa xuÉn nhu ?n d? c?a t†i sinh vÖ kh?i d?u, d?t trong m?ch suy tu cìng dÉn c?a nhÖ tho. D?ng dao k?t n?i qu† kh? dÉn gian v?i hi?n t?i tr? trung.</p>
+                <h4 class="mt-3">Ngh? thu?t</h4>
+                <ul>
+                  <li>Nh?p di?u d?ng dao t?o t°nh h†t n¢i, d? nh?, d? truy?n.</li>
+                  <li>Hçnh ?nh lÖm m?i ch?t li?u dÉn gian b?ng c?m quan hi?n d?i.</li>
+                  <li>Ngìn ng? trong s†ng, giÖu nh?c t°nh, giÖu t°nh h?a.</li>
+                </ul>
+              </div>
+              <div class="col-md-6">
+                <h3>Thìng di?p</h3>
+                <ul>
+                  <li>Nuìi du?ng hy v?ng vÖ tr†ch nhi?m ? th? h? tr?.</li>
+                  <li>Tìn vinh van h¢a dÉn gian nhu ngu?n nang lu?ng tinh th?n.</li>
+                  <li>K?t n?i vui tuoi v?i chi?u sÉu suy tu th? s?.</li>
+                </ul>
+                <div class="glass p-3 mt-2">
+                  <strong>?ng d?ng d?y h?c</strong>
+                  <ul class="mb-0">
+                    <li>Ho?t d?ng d?c di?n c?m theo nh?p d?ng dao.</li>
+                    <li>B?n d? tu duy: hçnh tu?ng xuÉn, tr? em, c†nh d?ng.</li>
+                    <li>Liàn van b?n v?i <em>D?t nu?c</em> trong tru?ng ca <em>M?t du?ng kh†t v?ng</em>.</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- DONG THOI GIAN -->
+    <section class="container" data-route="dong-thoi">
+      <div class="glass p-4 p-md-5 fancy-card" data-aos="fade-up">
+        <div class="chip mb-3"><i class="bi bi-clock-history"></i><span>Dïng th?i gian</span></div>
+        <h3 class="mb-4">M?c liàn quan</h3>
+        <div class="row g-4">
+          <div class="col-md-4">
+            <div class="p-3 glass h-100">
+              <h5>1943</h5>
+              <p>Sinh t?i Th?a Thiàn Hu?.</p>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="p-3 glass h-100">
+              <h5>1971</h5>
+              <p>Tru?ng ca <em>M?t du?ng kh†t v?ng</em>, do?n tr°ch <em>D?t nu?c</em> gÉy ti?ng vang.</p>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="p-3 glass h-100">
+              <h5>H?u chi?n</h5>
+              <p>Tho th? s?, c?m h?ng cìng dÉn, nhi?u thi ph?m v? ni?m tin vÖ van h¢a dÉn gian.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- THU VIEN -->
+    <section class="container" data-route="thu-vien">
+      <div class="row g-4">
+        <div class="col-lg-7">
+          <div class="glass p-4 p-md-5 fancy-card" data-aos="fade-up">
+            <div class="chip mb-3"><i class="bi bi-images"></i><span>Thu vi?n</span></div>
+            <div class="row g-3 gallery">
+              <div class="col-6"><img src="https://images.unsplash.com/photo-1526318472351-c75fcf070305?q=80&w=1200&auto=format&fit=crop" alt="spring"/></div>
+              <div class="col-6"><img src="https://images.unsplash.com/photo-1433086966358-54859d0ed716?q=80&w=1200&auto=format&fit=crop" alt="fields"/></div>
+              <div class="col-6"><img src="https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?q=80&w=1200&auto=format&fit=crop" alt="book2"/></div>
+              <div class="col-6"><img src="https://images.unsplash.com/photo-1528207776546-365bb710ee93?q=80&w=1200&auto=format&fit=crop" alt="notes"/></div>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-5">
+          <div class="glass p-4 h-100" data-aos="zoom-in">
+            <h3 class="mb-2">TÖi li?u g?i y</h3>
+            <ul>
+              <li>Nguy?n Khoa Di?m, c†c t?p tho ch?n l?c.</li>
+              <li>Tru?ng ca <em>M?t du?ng kh†t v?ng</em> vÖ phà bçnh liàn quan.</li>
+              <li>Chuyàn lu?n v? tho Vi?t Nam giai do?n ch?ng M?.</li>
+            </ul>
+            <p class="sub">Tçm thàm ? thu vi?n s?, co s? d? li?u h?c thu?t, ho?c NXB trong nu?c.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- QUIZ -->
+    <section class="container" data-route="quiz">
+      <div class="glass p-4 p-md-5 fancy-card" data-aos="fade-up">
+        <div class="chip mb-3"><i class="bi bi-patch-question"></i><span>Mini Quiz</span></div>
+        <p class="sub">Ch?n d†p †n d£ng. Hi?u ?ng ch?m di?m t?c thç.</p>
+        <div id="quizBox" class="row g-3"></div>
+        <button id="submitQuiz" class="btn btn-lg btn-success mt-3"><i class="bi bi-check2-square"></i> N?p bÖi</button>
+        <div id="quizResult" class="mt-3 fs-5"></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="container">
+    <div class="d-flex flex-wrap gap-3 align-items-center justify-content-between">
+      <div>
+        <span class="brand">HashRouter #/</span>
+        <span class="ms-2 sub">Hi?u ?ng mu?t mÖ, khìng c?n backend.</span>
+      </div>
+      <div class="d-flex gap-3">
+        <a href="#/home" class="nav-link">Trang ch?</a>
+        <a href="#/tac-gia" class="nav-link">T†c gi?</a>
+        <a href="#/bai-tho" class="nav-link">BÖi tho</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Vendor scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/vanilla-tilt@1.8.1/dist/vanilla-tilt.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/aos@2.3.4/dist/aos.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.2/lib/anime.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/tsparticles@3.7.1/tsparticles.bundle.min.js" defer></script>
+
+  <!-- App -->
+  <script type="module">
+    // Init AOS
+    window.addEventListener('load', () => AOS.init({ once:false, duration:900, easing:'ease-out-cubic' }));
+
+    // Cursor dot
+    const cursor = document.createElement('div');
+    cursor.className = 'cursor-dot';
+    document.body.appendChild(cursor);
+    window.addEventListener('mousemove', e => { cursor.style.transform = `translate(${e.clientX - 5}px, ${e.clientY - 5}px)`; });
+
+    // Background particles with tsParticles
+    const loadParticles = async () => {
+      const { tsParticles } = window;
+      await tsParticles.load({ id: 'tsparticles', options: {
+        fullScreen: { enable: true, zIndex: -1 },
+        particles: {
+          number: { value: 60 },
+          color: { value: ['#7c3aed','#06b6d4','#a3e635','#ffffff'] },
+          shape: { type: 'circle' },
+          opacity: { value: 0.5 },
+          size: { value: { min:1, max:3 } },
+          move: { enable: true, speed: 1, outModes: { default:'out' } },
+          links: { enable: true, opacity: .25, color:'#8b5cf6' }
+        },
+        detectRetina: true
+      }});
+    };
+    loadParticles();
+
+    // Starfield canvas for extra flair
+    const starCanvas = document.getElementById('bg-stars');
+    const ctx = starCanvas.getContext('2d');
+    const stars = Array.from({length: 90}, () => ({ x: Math.random(), y: Math.random(), z: Math.random() }));
+    const onResize = () => { starCanvas.width = innerWidth; starCanvas.height = innerHeight; };
+    window.addEventListener('resize', onResize); onResize();
+    function draw(){
+      ctx.clearRect(0,0,starCanvas.width, starCanvas.height);
+      for (const s of stars){
+        s.z -= 0.002; if(s.z <= 0) s.z = 1;
+        const px = (s.x - .5) / s.z * starCanvas.width + starCanvas.width/2;
+        const py = (s.y - .5) / s.z * starCanvas.height + starCanvas.height/2;
+        const size = (1 - s.z) * 3 + 0.3;
+        ctx.fillStyle = `rgba(255,255,255,${1 - s.z})`;
+        ctx.beginPath(); ctx.arc(px, py, size, 0, Math.PI*2); ctx.fill();
+      }
+      requestAnimationFrame(draw);
+    } draw();
+
+    // Hash Router (#/route)
+    const routes = [...document.querySelectorAll('section[data-route]')];
+    const navLinks = [...document.querySelectorAll('[data-link]')];
+    const setActiveLink = (route) => {
+      navLinks.forEach(a => a.classList.toggle('active', a.getAttribute('href') === `#/${route}`));
+    };
+
+    const transitionBlobs = [document.getElementById('blob1'), document.getElementById('blob2')];
+    const animateTransition = async () => new Promise(resolve => {
+      const tl = gsap.timeline({ onComplete: resolve });
+      tl.set(transitionBlobs, { left: '50%', top:'50%', scale: 0, opacity: .6 })
+        .to(transitionBlobs, { scale: 1.2, duration: .35, ease:'power2.in' })
+        .to(transitionBlobs, { scale: 0, opacity:0, duration:.5, ease:'power3.out' }, "+=.05");
+    });
+
+    const showRoute = async (route) => {
+      const name = route?.replace('#/','') || 'home';
+      setActiveLink(name);
+      await animateTransition();
+      routes.forEach(sec => sec.classList.remove('show'));
+      const target = document.querySelector(`[data-route="${name}"]`) || document.querySelector('[data-route="home"]');
+      target.classList.add('show');
+      // entrance animations
+      gsap.fromTo(target.querySelectorAll('.glass, .card, h1, h2, h3, .chip'), { y: 20, opacity: 0 }, { y: 0, opacity:1, stagger:.05, duration:.6, ease:'power2.out' });
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    window.addEventListener('hashchange', () => showRoute(location.hash));
+    if(!location.hash) location.hash = '#/home';
+    showRoute(location.hash);
+
+    // Hero title split animation using Anime.js
+    const fancyLines = [
+      'R?n rÖng nh?p d?ng dao',
+      'Tuoi m?i hoi th? xuÉn',
+      'Tin yàu th? h? tr?'
+    ];
+    const linesBox = document.getElementById('lines');
+    document.getElementById('revealLines').addEventListener('click', ()=>{
+      linesBox.innerHTML = '';
+      fancyLines.forEach((text, i)=>{
+        const el = document.createElement('div');
+        el.textContent = text; el.style.opacity = 0; linesBox.appendChild(el);
+        anime({ targets: el, translateY: [16,0], opacity:[0,1], duration: 700, delay: i*160, easing:'easeOutCubic' });
+      });
+    });
+
+    // ScrollTrigger demo animations
+    gsap.utils.toArray('.gallery img').forEach((img, i)=>{
+      gsap.from(img, { scrollTrigger: { trigger: img, start:'top 85%' }, y:20, opacity:0, rotate: (i%2?3:-3), duration:.6, ease:'power2.out' });
+    });
+
+    // Quiz
+    const quiz = [
+      { q:'Nguy?n Khoa Di?m sinh nam nÖo?', a:['1930','1943','1954','1960'], c:1 },
+      { q:'Do?n tr°ch "D?t nu?c" thu?c t†c ph?m nÖo?', a:['Tru?ng ca M?t du?ng kh†t v?ng','Ngìi nhÖ c¢ l?a ?m','C†t tr?ng','D?ng dao móa xuÉn'], c:0 },
+      { q:'"D?ng dao móa xuÉn" nh?n m?nh nh?p di?u nÖo?', a:['L?c b†t c? di?n','T? do siàu th?c','D?ng dao dÉn gian','Th?t ngìn b†t c£'], c:2 },
+      { q:'M?t ch? d? l?p l?i trong tho N. K. Di?m lÖ gç?', a:['Huy?n b° k? ?o','C?i ngu?n van h¢a vÖ tinh th?n cìng dÉn','Du ky vi?n tu?ng','Tri?t h?c siàu hçnh phuong TÉy'], c:1 }
+    ];
+
+    const quizBox = document.getElementById('quizBox');
+    quiz.forEach((item, idx)=>{
+      const card = document.createElement('div'); card.className = 'col-12';
+      card.innerHTML = `
+        <div class="p-3 glass">
+          <div class="fw-bold mb-2">${idx+1}. ${item.q}</div>
+          ${item.a.map((opt, i)=>`<label class="d-block mb-1"><input class="form-check-input me-2" type="radio" name="q${idx}" value="${i}"> ${opt}</label>`).join('')}
+        </div>`;
+      quizBox.appendChild(card);
+    });
+
+    document.getElementById('submitQuiz').addEventListener('click', ()=>{
+      let score = 0; let total = quiz.length;
+      quiz.forEach((item, idx)=>{
+        const picked = document.querySelector(`input[name=q${idx}]:checked`);
+        if(picked && Number(picked.value) === item.c) score++;
+      });
+      const r = document.getElementById('quizResult');
+      r.innerHTML = `Di?m: <strong>${score}/${total}</strong>`;
+      gsap.fromTo(r, { scale:.9, opacity:0 }, { scale:1, opacity:1, duration:.4, ease:'back.out(2)' });
+    });
+
+    // Hover magnetic brand
+    const brand = document.getElementById('brand');
+    brand.addEventListener('mousemove', (e)=>{
+      const rect = brand.getBoundingClientRect();
+      const dx = (e.clientX - rect.left) / rect.width - .5;
+      const dy = (e.clientY - rect.top) / rect.height - .5;
+      gsap.to(brand, { x: dx*6, y: dy*6, rotate: dx*4, duration:.2 });
+    });
+    brand.addEventListener('mouseleave', ()=> gsap.to(brand, { x:0, y:0, rotate:0, duration:.3 }));
+  </script>
+</body>
+</html>
+
